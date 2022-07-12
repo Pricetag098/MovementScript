@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
         running,
         jumping,
         crouch,
+        inAir,
         sliding //soon
     }
     public MovementStates movementState = MovementStates.walking;
@@ -35,6 +36,8 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Controls how quickly the player slows down without input")]
     public float counterForce = 30;
 
+    public float gravForce  = 9.8f * 5;
+    public float jumpGravScale = .5f;
     [Space]
     [Header("Ground finding variables")]
     [SerializeField] private float gcRadius = .1f;
@@ -50,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+
     }
 
     //returns inputed dirction X represents left and right, Y represents forward / backward
@@ -81,7 +85,7 @@ public class PlayerMovement : MonoBehaviour
                 }
 				if (!grounded)
                 {
-                    movementState = MovementStates.jumping;
+                    movementState = MovementStates.inAir;
                     break;
                 }
                 if (Input.GetKey(KeyCode.LeftShift) && !(Mathf.Abs(inputDir.y) > 0 || inputDir.x < 0))
@@ -107,7 +111,7 @@ public class PlayerMovement : MonoBehaviour
                 }
                 if (!grounded)
                 {
-                    movementState = MovementStates.jumping;
+                    movementState = MovementStates.inAir;
                     break;
                 }
                 if (Input.GetKeyUp(KeyCode.LeftShift) ||  Mathf.Abs(inputDir.y) > 0 || inputDir.x <0)
@@ -134,7 +138,7 @@ public class PlayerMovement : MonoBehaviour
                 if (!grounded)
                 {
                     UnCrouchCollider();
-                    movementState = MovementStates.jumping;
+                    movementState = MovementStates.inAir;
                     break;
                 }
                 if (Input.GetKeyUp(KeyCode.LeftControl))
@@ -144,16 +148,25 @@ public class PlayerMovement : MonoBehaviour
 				}
                 break;
             case MovementStates.jumping:
-				if (grounded)
+                if(rb.velocity.y < 0 || Input.GetKeyUp(KeyCode.Space))
 				{
-                    movementState = MovementStates.walking;
+                    movementState |= MovementStates.inAir;
 				}
                 break;
-		}
+            case MovementStates.inAir:
+                if (grounded)
+                {
+                    movementState = MovementStates.walking;
+                }
+                break;
+        }
 
     }
     private void Jump()
 	{
+        Vector3 vel = rb.velocity;
+        vel.y = 0;
+        rb.velocity = vel;
         rb.AddForce(Vector3.up * jumpForce);
 	}
 	private void FixedUpdate()
@@ -171,6 +184,7 @@ public class PlayerMovement : MonoBehaviour
                 //clamp the velocity
                 ClampVel(walkSpeed);
 
+               
                 //add a slowing force if player gives no input
                 if (forceDir.sqrMagnitude == 0)
                 {
@@ -209,11 +223,22 @@ public class PlayerMovement : MonoBehaviour
                 break;
             case MovementStates.jumping:
                 //TODO: Add Air Control
+                ApplyGravity(jumpGravScale);
+                break;
+            case MovementStates.inAir:
+                //TODO: Add Air Control
+                ApplyGravity(1);
                 break;
         }
 
         //UpdateGrav();
     }
+
+    //Called whenever the player
+    void ApplyGravity(float scale)
+	{
+        rb.AddForce(Vector3.down * gravForce * scale);
+	}
 
     void ClampVel(float amount)
 	{
@@ -224,7 +249,7 @@ public class PlayerMovement : MonoBehaviour
     void ApplyCounterForce()
 	{
         Vector3 counter = -rb.velocity * counterForce;
-        counter.y = 0;
+        //counter.y = 0;
         rb.AddForce(counter);
     }
 
