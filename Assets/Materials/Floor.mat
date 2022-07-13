@@ -21,14 +21,13 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Floor
-  m_Shader: {fileID: 4800000, guid: ee7e4c9a5f6364b688a332c67fc32cca, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 9df6408f9fefb04489d31019fcfa5803, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2000
-  stringTagMap:
-    RenderType: Opaque
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -94,6 +93,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Vector1_a4b23aea4122483689d5f11a81eb3780: 107.3
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -124,6 +124,8 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - Color_018770ab88094bf182adbd5933e6a410: {r: 0.41509432, g: 0.115521535, b: 0.115521535, a: 0}
+    - Color_e64ebdc5e9a242eda312271ba0d4b858: {r: 0.3301887, g: 0.07320221, b: 0.07320221, a: 1}
     - _BaseColor: {r: 0.4509804, g: 0.17647061, b: 0.18631153, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

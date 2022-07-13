@@ -22,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Objects to refrence")]
     [SerializeField] private CapsuleCollider movementCollider;
     [SerializeField] private Transform Cam;
+    [SerializeField] private Transform Head;
 
     [Space]
     [Header("SpeedVariables")]
@@ -29,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
     public float crouchSpeed = 2;
     public float runSpeed = 15;
     public float jumpForce = 100;
+    public float minSlideVel = 5;
+    public float slidingCounterForce = 5;
 
     [Tooltip("Controls how quickly the player reaches max speed")]
     public float acceleration = 10;
@@ -42,13 +45,19 @@ public class PlayerMovement : MonoBehaviour
     [Header("Ground finding variables")]
     [SerializeField] private float gcRadius = .1f;
     [SerializeField] private float gcOffset = 1;
+    [SerializeField] private float maxGroundAngle = 45;
+    
+
     [SerializeField] private LayerMask groundLayer;
 
     [SerializeField] private bool grounded = true;
    
+    
 
     Rigidbody rb;
     Vector2 inputDir;
+    Vector3 groundNormal;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -70,6 +79,23 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         grounded = Physics.CheckSphere(transform.position - Vector3.up * gcOffset,gcRadius, groundLayer);
+        RaycastHit hit;
+		if (grounded)
+		{
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, groundLayer))
+            {
+                groundNormal = hit.normal;
+                if (Vector3.Angle(Vector3.up, groundNormal) > maxGroundAngle)
+                {
+                    grounded = false;
+                }
+            }
+		}
+		else
+		{
+            groundNormal = Vector3.down;
+		}
+        
         inputDir = GetDir();
         transform.rotation = Quaternion.Euler(0, Cam.rotation.eulerAngles.y, 0);
         //handle input and state changing actual movement is done in fixed update
@@ -156,8 +182,31 @@ public class PlayerMovement : MonoBehaviour
             case MovementStates.inAir:
                 if (grounded)
                 {
-                    movementState = MovementStates.walking;
+                    if (Input.GetKey(KeyCode.LeftControl))
+                    {
+                        movementState = MovementStates.sliding;
+                        CrouchCollider();
+                    }
+                    else { movementState = MovementStates.walking; }
                 }
+                break;
+            case MovementStates.sliding:
+				if (Input.GetKeyUp(KeyCode.LeftControl))
+				{
+                    movementState = MovementStates.walking;
+                    UnCrouchCollider();
+				}
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    UnCrouchCollider();
+                    Jump();
+                    movementState = MovementStates.jumping;
+                    break;
+                }
+                if(rb.velocity.magnitude < minSlideVel)
+				{
+                    movementState = MovementStates.crouch;
+				}
                 break;
         }
 
@@ -229,6 +278,12 @@ public class PlayerMovement : MonoBehaviour
                 //TODO: Add Air Control
                 ApplyGravity(1);
                 break;
+
+            case MovementStates.sliding:
+                ApplyGravity(2);
+                ApplySlidingCounterForce();
+                
+                break;
         }
 
         //UpdateGrav();
@@ -252,19 +307,28 @@ public class PlayerMovement : MonoBehaviour
         //counter.y = 0;
         rb.AddForce(counter);
     }
+    void ApplySlidingCounterForce()
+    {
+        Vector3 counter = -rb.velocity * slidingCounterForce;
+        counter.y = 0;
+        rb.AddForce(counter);
+    }
 
-	
+
 
     void CrouchCollider()
 	{
         movementCollider.height = 1;
         movementCollider.center = new Vector3(0, -.5f, 0);
+        Head.transform.localPosition = new Vector3(0, 0, 0);
     }
     void UnCrouchCollider()
     {
         movementCollider.height = 2;
         movementCollider.center = new Vector3(0, 0, 0);
+        Head.transform.localPosition = new Vector3(0, 0.8f, 0);
     }
+
     bool CanJump()
 	{
         return false;
