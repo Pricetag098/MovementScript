@@ -30,15 +30,15 @@ public class PlayerMovement : MonoBehaviour
     public float crouchSpeed = 2;
     public float runSpeed = 15;
     public float jumpForce = 100;
-    public float minSlideVel = 5;
-    public float slidingCounterForce = 5;
+    [Space]
 
     [Tooltip("Controls how quickly the player reaches max speed")]
     public float acceleration = 10;
 
     [Tooltip("Controls how quickly the player slows down without input")]
     public float counterForce = 30;
-
+    public float minSlideVel = 5;
+    public float slidingCounterForce = 5;
     public float gravForce  = 9.8f * 5;
     public float jumpGravScale = .5f;
     [Space]
