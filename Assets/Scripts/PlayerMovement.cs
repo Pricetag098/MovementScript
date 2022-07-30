@@ -26,25 +26,25 @@ public class PlayerMovement : MonoBehaviour
 
     [Space]
     [Header("SpeedVariables")]
-    public float walkSpeed = 8;
-    public float crouchSpeed = 2;
-    public float runSpeed = 15;
-    public float jumpForce = 100;
+    public float walkSpeed = 10;
+    public float crouchSpeed = 5;
+    public float runSpeed = 20;
+    public float jumpForce = 1000;
     [Space]
 
     [Tooltip("Controls how quickly the player reaches max speed")]
     public float acceleration = 10;
 
     [Tooltip("Controls how quickly the player slows down without input")]
-    public float counterForce = 30;
+    public float counterForce = 60;
     public float minSlideVel = 5;
-    public float slidingCounterForce = 5;
-    public float gravForce  = 9.8f * 5;
-    public float jumpGravScale = .5f;
+    public float slidingCounterForce = 1;
+    public float gravForce  = 49;
+    public float jumpGravScale = 0.5f;
     [Space]
     [Header("Ground finding variables")]
-    [SerializeField] private float gcRadius = .1f;
-    [SerializeField] private float gcOffset = 1;
+    [SerializeField] private float gcRadius = 0.49f;
+    [SerializeField] private float gcOffset = 0.52f;
     [SerializeField] private float maxGroundAngle = 45;
     
 
